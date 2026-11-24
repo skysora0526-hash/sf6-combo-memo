@@ -52,9 +52,11 @@ export default function ComboEditor() {
   const leaving = useRef(false)
   const [newSit, setNewSit] = useState<string | null>(null)
 
-  // AI 認識結果の受け取り
+  // AI 認識結果の受け取り（StrictMode の二重実行でも 1 回だけ）
+  const draftTaken = useRef(false)
   useEffect(() => {
-    if (!comboId && draft && draft.characterId === charId) {
+    if (!draftTaken.current && !comboId && draft && draft.characterId === charId) {
+      draftTaken.current = true
       hist.reset(draft.route)
       setMeta((m) => ({ ...m, source: 'ai' }))
       setDirty(true)

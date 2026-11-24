@@ -152,7 +152,7 @@ export function RouteEditor(p: Props) {
               >
                 {stepLabel(s, map, notation)}
                 {s.note && <Icon name="note" className="ml-1 inline size-3 text-ink-2" />}
-                {s.ai && (
+                {s.ai && s.ai.confidence > 0 && s.ai.confidence < 1 && (
                   <span className="ml-1 text-[10px] font-normal text-ink-3">{Math.round(s.ai.confidence * 100)}%</span>
                 )}
               </button>
