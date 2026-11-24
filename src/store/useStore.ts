@@ -4,6 +4,50 @@ import { useMemo } from 'react'
 import type { CharacterDef, Combo, MoveDef, Notation, Situation } from '../types'
 import { BUILTIN_CHARACTERS, COMMON_MOVES, DEFAULT_SITUATIONS, placeholderMoves } from '../data'
 import { uid } from '../lib/id'
+import { toast } from '../components/ui'
+
+let warned = false
+/** localStorage の書き込み失敗（容量超過・プライベートモード等）を通知するラッパー */
+export const safeStorage: Storage = {
+  get length() {
+    try {
+      return localStorage.length
+    } catch {
+      return 0
+    }
+  },
+  key: (i) => {
+    try {
+      return localStorage.key(i)
+    } catch {
+      return null
+    }
+  },
+  getItem: (k) => {
+    try {
+      return localStorage.getItem(k)
+    } catch {
+      return null
+    }
+  },
+  setItem: (k, v) => {
+    try {
+      localStorage.setItem(k, v)
+      warned = false
+    } catch {
+      if (!warned) toast('ブラウザに保存できませんでした（容量不足など）。「データ」からバックアップを書き出してください', 'err')
+      warned = true
+    }
+  },
+  removeItem: (k) => {
+    try {
+      localStorage.removeItem(k)
+    } catch {
+      /* noop */
+    }
+  },
+  clear: () => {},
+}
 
 export interface AppState {
   combos: Combo[]
@@ -127,7 +171,7 @@ export const useStore = create<AppState>()(
     {
       name: STORAGE_KEY,
       version: 1,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => safeStorage),
       partialize: (s) => ({
         combos: s.combos,
         charMemos: s.charMemos,

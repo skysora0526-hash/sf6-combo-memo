@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { uid } from '../lib/id'
+import { safeStorage } from '../store/useStore'
 
 /** ユーザーが確認画面で確定した区間の特徴量（AI 用の学習データ） */
 export interface MoveTemplate {
@@ -36,6 +37,6 @@ export const useTemplates = create<TemplateState>()(
       remove: (id) => set((s) => ({ templates: s.templates.filter((x) => x.id !== id) })),
       clear: (characterId) => set((s) => ({ templates: s.templates.filter((x) => x.characterId !== characterId) })),
     }),
-    { name: 'sf6-combo-memo-ai-templates', version: 1, storage: createJSONStorage(() => localStorage) },
+    { name: 'sf6-combo-memo-ai-templates', version: 1, storage: createJSONStorage(() => safeStorage) },
   ),
 )

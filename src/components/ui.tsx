@@ -12,7 +12,7 @@ export const useToast = create<ToastState>((set) => ({
   items: [],
   push: (text, kind = 'ok') => {
     const id = Date.now() + Math.random()
-    set((s) => ({ items: [...s.items, { id, text, kind }] }))
+    set((s) => ({ items: [...s.items.slice(-2), { id, text, kind }] }))
     setTimeout(() => set((s) => ({ items: s.items.filter((i) => i.id !== id) })), 2600)
   },
 }))
@@ -21,7 +21,7 @@ export const toast = (text: string, kind?: 'ok' | 'err' | 'info') => useToast.ge
 export function Toaster() {
   const items = useToast((s) => s.items)
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4" role="status" aria-live="polite">
+    <div className="pointer-events-none fixed inset-x-0 bottom-32 sm:bottom-4 z-[100] flex flex-col items-center gap-2 px-4" role="status" aria-live="polite">
       {items.map((t) => (
         <div
           key={t.id}

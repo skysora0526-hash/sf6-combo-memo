@@ -219,7 +219,7 @@ export default function ComboEditor() {
           </p>
         </div>
 
-        <aside className="panel h-fit space-y-4 p-4 lg:sticky lg:top-16">
+        <aside id="meta" className="panel h-fit scroll-mt-20 space-y-4 p-4 lg:sticky lg:top-16">
           <label className="block">
             <span className="label">コンボ名</span>
             <div className="flex gap-1.5">
@@ -321,6 +321,19 @@ export default function ComboEditor() {
           <p className="text-xs text-ink-3">表記: {notation === 'name' ? '正式名' : notation === 'short' ? '略称' : 'テンキー'}（右上で切り替え）</p>
         </aside>
       </div>
+
+      {/* スマホ: 下部固定の保存バー（ボトムナビの上） */}
+      <div className="fixed inset-x-0 bottom-[57px] sm:bottom-0 z-30 flex items-center gap-2 border-t border-line bg-bg/95 px-4 py-2 backdrop-blur lg:hidden">
+        <span className="text-xs text-ink-3">{route.length} 手</span>
+        <a href="#meta" onClick={(e) => { e.preventDefault(); document.getElementById('meta')?.scrollIntoView({ behavior: 'smooth' }) }} className="btn btn-sm btn-ghost">
+          詳細を入力
+        </a>
+        <button className="btn btn-primary btn-sm ml-auto" onClick={() => save()} data-testid="save-combo-mobile">
+          <Icon name="check" className="size-3.5" />
+          保存
+        </button>
+      </div>
+      <div className="h-12 lg:hidden" />
 
       <Modal open={newSit !== null} onClose={() => setNewSit(null)} title="状況を追加">
         <form
