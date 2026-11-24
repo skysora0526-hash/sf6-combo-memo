@@ -162,6 +162,9 @@ export default function ComboEditor() {
       return
     }
     leaving.current = true
+    // 遷移が描画される前に別の画面へ移っても入力内容が残らないようにクリア
+    hist.reset([])
+    setMeta(DEFAULT_META)
     navigate(`/c/${ch.id}`)
   }
 

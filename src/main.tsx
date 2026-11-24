@@ -1,6 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createHashRouter, RouterProvider } from 'react-router-dom'
+import { createHashRouter, RouterProvider, useLocation } from 'react-router-dom'
 import './index.css'
 import { Layout } from './components/Layout'
 import { ErrorPage } from './components/ErrorPage'
@@ -19,6 +19,12 @@ const ai = (
   </Suspense>
 )
 
+/** 遷移ごとにエディタを作り直す（別キャラ・別コンボへの直接遷移で入力状態が残らないように） */
+function EditorRoute() {
+  const loc = useLocation()
+  return <ComboEditor key={`${loc.pathname}|${loc.key}`} />
+}
+
 const router = createHashRouter([
   {
     element: <Layout />,
@@ -27,8 +33,8 @@ const router = createHashRouter([
       { path: '/', element: <CharacterSelect /> },
       { path: '/combos', element: <AllCombos /> },
       { path: '/c/:charId', element: <CharacterPage /> },
-      { path: '/c/:charId/new', element: <ComboEditor key="new" /> },
-      { path: '/c/:charId/edit/:comboId', element: <ComboEditor /> },
+      { path: '/c/:charId/new', element: <EditorRoute /> },
+      { path: '/c/:charId/edit/:comboId', element: <EditorRoute /> },
       { path: '/c/:charId/ai', element: ai },
       { path: '/ai', element: ai },
       { path: '/share', element: <ShareView /> },
