@@ -214,7 +214,11 @@ function ImageDialog({ open, onClose, charId, current, custom }: { open: boolean
   const deleteChar = useStore((s) => s.deleteCustomCharacter)
   const navigate = useNavigate()
   const [url, setUrl] = useState(current ?? '')
-  useEffect(() => setUrl(current ?? ''), [current, open])
+  const [confirmDel, setConfirmDel] = useState(false)
+  useEffect(() => {
+    setUrl(current ?? '')
+    setConfirmDel(false)
+  }, [current, open])
 
   const onFile = (f: File) => {
     // localStorage 容量対策として 128px に縮小して保存
@@ -260,13 +264,12 @@ function ImageDialog({ open, onClose, charId, current, custom }: { open: boolean
             <button
               className="btn btn-danger btn-sm"
               onClick={() => {
-                if (confirm('このキャラクターと登録済みコンボをすべて削除します。よろしいですか？')) {
-                  deleteChar(charId)
-                  navigate('/')
-                }
+                if (!confirmDel) return setConfirmDel(true)
+                deleteChar(charId)
+                navigate('/')
               }}
             >
-              このキャラクターを削除
+              {confirmDel ? 'もう一度押すと、コンボも含めて完全に削除します' : 'このキャラクターを削除'}
             </button>
           </div>
         )}

@@ -58,6 +58,7 @@ export default function AiRecognize() {
   const [selected, setSelected] = useState<string | null>(null)
   const [recording, setRecording] = useState<null | { stop: () => Promise<Blob> }>(null)
   const [error, setError] = useState<string | null>(null)
+  const [clearArmed, setClearArmed] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const stopAtRef = useRef<number | null>(null)
 
@@ -447,8 +448,8 @@ export default function AiRecognize() {
             <div className="border-t border-line pt-3 text-xs text-ink-3">
               {ch.name} の学習データ: {tplCount} 件
               {tplCount > 0 && (
-                <button className="ml-2 underline hover:text-ink" onClick={() => confirm('このキャラの学習データを消去しますか？') && clearTemplates(ch.id)}>
-                  消去
+                <button className="ml-2 underline hover:text-ink" onClick={() => (clearArmed ? (clearTemplates(ch.id), setClearArmed(false)) : setClearArmed(true))}>
+                  {clearArmed ? 'もう一度押すと消去' : '消去'}
                 </button>
               )}
             </div>
