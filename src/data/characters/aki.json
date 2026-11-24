@@ -1,0 +1,25 @@
+{
+ "id": "aki",
+ "name": "A.K.I.",
+ "nameEn": "A.K.I.",
+ "color": "#a855f7",
+ "order": 20,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "凶襲突",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "蛇軽功",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "蛇頭鞭",
+   "category": "special"
+  }
+ ]
+}

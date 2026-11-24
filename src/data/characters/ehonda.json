@@ -1,0 +1,32 @@
+{
+ "id": "ehonda",
+ "name": "E.本田",
+ "nameEn": "E.Honda",
+ "color": "#60a5fa",
+ "order": 11,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "スーパー頭突き",
+   "category": "special",
+   "numpad": "[4]6P"
+  },
+  {
+   "id": "sp2",
+   "name": "百裂張り手",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "スーパー百貫落とし",
+   "category": "special",
+   "numpad": "[2]8K"
+  },
+  {
+   "id": "sp4",
+   "name": "大銀杏投げ",
+   "category": "special"
+  }
+ ]
+}

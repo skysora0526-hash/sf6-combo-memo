@@ -1,0 +1,25 @@
+{
+ "id": "juri",
+ "name": "ジュリ",
+ "nameEn": "Juri",
+ "color": "#c026d3",
+ "order": 6,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "風破刃",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "歳破衝",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "輪穿",
+   "category": "special"
+  }
+ ]
+}

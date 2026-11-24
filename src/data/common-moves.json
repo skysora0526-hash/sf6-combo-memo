@@ -1,0 +1,318 @@
+{
+ "moves": [
+  {
+   "id": "stlp",
+   "name": "立ち弱P",
+   "category": "normal",
+   "short": "立弱P",
+   "numpad": "5LP"
+  },
+  {
+   "id": "stlk",
+   "name": "立ち弱K",
+   "category": "normal",
+   "short": "立弱K",
+   "numpad": "5LK"
+  },
+  {
+   "id": "stmp",
+   "name": "立ち中P",
+   "category": "normal",
+   "short": "立中P",
+   "numpad": "5MP"
+  },
+  {
+   "id": "stmk",
+   "name": "立ち中K",
+   "category": "normal",
+   "short": "立中K",
+   "numpad": "5MK"
+  },
+  {
+   "id": "sthp",
+   "name": "立ち強P",
+   "category": "normal",
+   "short": "立強P",
+   "numpad": "5HP"
+  },
+  {
+   "id": "sthk",
+   "name": "立ち強K",
+   "category": "normal",
+   "short": "立強K",
+   "numpad": "5HK"
+  },
+  {
+   "id": "crlp",
+   "name": "屈弱P",
+   "category": "normal",
+   "short": "屈弱P",
+   "numpad": "2LP"
+  },
+  {
+   "id": "crlk",
+   "name": "屈弱K",
+   "category": "normal",
+   "short": "小足",
+   "numpad": "2LK",
+   "aliases": [
+    "小足"
+   ]
+  },
+  {
+   "id": "crmp",
+   "name": "屈中P",
+   "category": "normal",
+   "short": "屈中P",
+   "numpad": "2MP"
+  },
+  {
+   "id": "crmk",
+   "name": "屈中K",
+   "category": "normal",
+   "short": "中足",
+   "numpad": "2MK",
+   "aliases": [
+    "中足"
+   ]
+  },
+  {
+   "id": "crhp",
+   "name": "屈強P",
+   "category": "normal",
+   "short": "屈強P",
+   "numpad": "2HP"
+  },
+  {
+   "id": "crhk",
+   "name": "屈強K",
+   "category": "normal",
+   "short": "大足",
+   "numpad": "2HK",
+   "aliases": [
+    "大足"
+   ]
+  },
+  {
+   "id": "jlp",
+   "name": "ジャンプ弱P",
+   "category": "normal",
+   "short": "J弱P",
+   "numpad": "j.LP"
+  },
+  {
+   "id": "jlk",
+   "name": "ジャンプ弱K",
+   "category": "normal",
+   "short": "J弱K",
+   "numpad": "j.LK"
+  },
+  {
+   "id": "jmp",
+   "name": "ジャンプ中P",
+   "category": "normal",
+   "short": "J中P",
+   "numpad": "j.MP"
+  },
+  {
+   "id": "jmk",
+   "name": "ジャンプ中K",
+   "category": "normal",
+   "short": "J中K",
+   "numpad": "j.MK"
+  },
+  {
+   "id": "jhp",
+   "name": "ジャンプ強P",
+   "category": "normal",
+   "short": "J強P",
+   "numpad": "j.HP"
+  },
+  {
+   "id": "jhk",
+   "name": "ジャンプ強K",
+   "category": "normal",
+   "short": "J強K",
+   "numpad": "j.HK"
+  },
+  {
+   "id": "throw",
+   "name": "投げ",
+   "category": "normal",
+   "numpad": "LPLK",
+   "aliases": [
+    "通常投げ"
+   ]
+  },
+  {
+   "id": "di",
+   "name": "ドライブインパクト",
+   "category": "drive",
+   "short": "インパクト",
+   "numpad": "DI",
+   "driveCost": 1,
+   "aliases": [
+    "DI",
+    "インパクト"
+   ]
+  },
+  {
+   "id": "pdr",
+   "name": "ドライブラッシュ（パリィ）",
+   "category": "drive",
+   "short": "生ラッシュ",
+   "numpad": "DR",
+   "driveCost": 1,
+   "aliases": [
+    "生ラ",
+    "パリィラッシュ",
+    "DR"
+   ]
+  },
+  {
+   "id": "cdr",
+   "name": "キャンセルラッシュ",
+   "category": "drive",
+   "short": "CR",
+   "numpad": "DRC",
+   "driveCost": 3,
+   "aliases": [
+    "DRC",
+    "キャンセルドライブラッシュ",
+    "ドライブラッシュ"
+   ]
+  },
+  {
+   "id": "drev",
+   "name": "ドライブリバーサル",
+   "category": "drive",
+   "short": "リバサ",
+   "numpad": "DRev",
+   "driveCost": 2,
+   "aliases": [
+    "DRev"
+   ]
+  },
+  {
+   "id": "parry",
+   "name": "ドライブパリィ",
+   "category": "drive",
+   "short": "パリィ",
+   "numpad": "DP",
+   "aliases": [
+    "パリィ"
+   ]
+  },
+  {
+   "id": "pparry",
+   "name": "ジャストパリィ",
+   "category": "drive",
+   "short": "ジャスパ",
+   "numpad": "JP",
+   "aliases": [
+    "ジャスパ"
+   ]
+  },
+  {
+   "id": "sa1",
+   "name": "スーパーアーツ1",
+   "category": "super",
+   "short": "SA1",
+   "numpad": "SA1",
+   "saCost": 1
+  },
+  {
+   "id": "sa2",
+   "name": "スーパーアーツ2",
+   "category": "super",
+   "short": "SA2",
+   "numpad": "SA2",
+   "saCost": 2
+  },
+  {
+   "id": "sa3",
+   "name": "スーパーアーツ3",
+   "category": "super",
+   "short": "SA3",
+   "numpad": "SA3",
+   "saCost": 3
+  },
+  {
+   "id": "ca",
+   "name": "クリティカルアーツ",
+   "category": "super",
+   "short": "CA",
+   "numpad": "CA",
+   "saCost": 3,
+   "aliases": [
+    "CA"
+   ]
+  },
+  {
+   "id": "jump",
+   "name": "ジャンプ",
+   "category": "system",
+   "short": "ジャンプ",
+   "numpad": "8"
+  },
+  {
+   "id": "fjump",
+   "name": "前ジャンプ",
+   "category": "system",
+   "short": "前J",
+   "numpad": "9"
+  },
+  {
+   "id": "fdash",
+   "name": "前ステップ",
+   "category": "system",
+   "short": "前ステ",
+   "numpad": "66"
+  },
+  {
+   "id": "bdash",
+   "name": "バックステップ",
+   "category": "system",
+   "short": "バクステ",
+   "numpad": "44"
+  },
+  {
+   "id": "walk",
+   "name": "前歩き",
+   "category": "system",
+   "short": "歩き",
+   "numpad": "6~"
+  },
+  {
+   "id": "cancel",
+   "name": "キャンセル",
+   "category": "connector",
+   "short": "キャンセル",
+   "numpad": ">",
+   "aliases": [
+    "キャンセル"
+   ]
+  },
+  {
+   "id": "link",
+   "name": "目押し",
+   "category": "connector",
+   "short": "目押し",
+   "numpad": ","
+  },
+  {
+   "id": "delay",
+   "name": "ディレイ",
+   "category": "connector",
+   "short": "ディレイ",
+   "numpad": "dl."
+  },
+  {
+   "id": "other",
+   "name": "その他",
+   "category": "connector",
+   "short": "その他",
+   "numpad": "?"
+  }
+ ]
+}

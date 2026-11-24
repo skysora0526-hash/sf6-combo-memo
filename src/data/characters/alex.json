@@ -1,0 +1,35 @@
+{
+ "id": "alex",
+ "name": "アレックス",
+ "nameEn": "Alex",
+ "color": "#0ea5e9",
+ "order": 29,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "フラッシュチョップ",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "パワーボム",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "エアニースマッシュ",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "エアスタンピード",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "スラッシュエルボー",
+   "category": "special"
+  }
+ ]
+}

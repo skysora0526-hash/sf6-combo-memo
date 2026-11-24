@@ -1,0 +1,30 @@
+{
+ "id": "ed",
+ "name": "エド",
+ "nameEn": "Ed",
+ "color": "#94a3b8",
+ "order": 21,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "サイコフリッカー",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "サイコアッパー",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "サイコブリッツ",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "キルステップ",
+   "category": "special"
+  }
+ ]
+}

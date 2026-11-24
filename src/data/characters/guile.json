@@ -1,0 +1,32 @@
+{
+ "id": "guile",
+ "name": "ガイル",
+ "nameEn": "Guile",
+ "color": "#65a30d",
+ "order": 8,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "ソニックブーム",
+   "category": "special",
+   "numpad": "[4]6P"
+  },
+  {
+   "id": "sp2",
+   "name": "サマーソルトキック",
+   "category": "special",
+   "numpad": "[2]8K"
+  },
+  {
+   "id": "sp3",
+   "name": "ソニックブレイド",
+   "category": "special"
+  },
+  {
+   "id": "un1",
+   "name": "ニーバズーカ",
+   "category": "unique"
+  }
+ ]
+}

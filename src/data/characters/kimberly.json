@@ -1,0 +1,35 @@
+{
+ "id": "kimberly",
+ "name": "キンバリー",
+ "nameEn": "Kimberly",
+ "color": "#f97316",
+ "order": 7,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "疾駆け",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "武神旋風脚",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "武神イズナ落とし",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "武神八双拳",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "スプレー缶",
+   "category": "special"
+  }
+ ]
+}

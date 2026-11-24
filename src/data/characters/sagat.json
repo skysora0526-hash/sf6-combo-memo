@@ -1,0 +1,33 @@
+{
+ "id": "sagat",
+ "name": "サガット",
+ "nameEn": "Sagat",
+ "color": "#b45309",
+ "order": 27,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "タイガーショット",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "グランドタイガーショット",
+   "category": "special",
+   "numpad": "236K"
+  },
+  {
+   "id": "sp3",
+   "name": "タイガーアッパーカット",
+   "category": "special",
+   "numpad": "623P"
+  },
+  {
+   "id": "sp4",
+   "name": "タイガーニークラッシュ",
+   "category": "special"
+  }
+ ]
+}

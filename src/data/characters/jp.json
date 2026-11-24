@@ -1,0 +1,30 @@
+{
+ "id": "jp",
+ "name": "JP",
+ "nameEn": "JP",
+ "color": "#a78bfa",
+ "order": 15,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "トリグラフ",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "ストリボーグ",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "デパーチャー",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "アムネジア",
+   "category": "special"
+  }
+ ]
+}

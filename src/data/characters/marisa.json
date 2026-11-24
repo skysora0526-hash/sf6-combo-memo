@@ -1,0 +1,30 @@
+{
+ "id": "marisa",
+ "name": "マリーザ",
+ "nameEn": "Marisa",
+ "color": "#eab308",
+ "order": 14,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "グラディウス",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "ファランクス",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "クアドリガ",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "エンポロス",
+   "category": "special"
+  }
+ ]
+}

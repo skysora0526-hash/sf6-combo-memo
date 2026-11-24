@@ -1,0 +1,149 @@
+# SF6 Combo Memo — 設計書
+
+## 1. 現在のプロジェクト構成（調査結果）
+
+- 作業ディレクトリ `/home/user` は **空**（既存コード・git リポジトリなし）。新規プロジェクトとして作成する。
+- 実行環境: Node.js 22 / npm 10 / Chromium + Playwright（動作確認用）。
+- 参考サイト `lustrous-haupia-12c661.netlify.app` は、この開発環境のネットワークから **名前解決できず閲覧不可** だった。
+  そのため依頼文に列挙された機能（登録・編集・削除 / コンボ名 / 状況 / 難易度 / ダメージ / SA / ドライブ / ルート / 全体メモ / 絞り込み / 共有）を仕様の正とした。
+
+## 2. 画面構成
+
+| 画面 | パス (Hash) | 役割 |
+|---|---|---|
+| キャラクター選択 | `#/` | 全キャラをグリッド表示。各キャラの登録コンボ数を表示。キャラ追加 |
+| キャラクター詳細（コンボ一覧） | `#/c/:charId` | そのキャラのコンボ一覧・検索・絞り込み・お気に入り・キャラ専用メモ・複数選択共有 |
+| 全コンボ一覧 | `#/combos` | キャラ横断の検索・絞り込み |
+| コンボエディタ | `#/c/:charId/new` `#/c/:charId/edit/:id` | 手動入力（技ボタンパレット＋ルート編集） |
+| AI 認識 | `#/c/:charId/ai` | 動画／画面キャプチャ入力 → 解析 → 候補確認・修正 → エディタへ送る |
+| 共有ビュー | `#/share?d=...` | 共有URLから閲覧・自分のメモ帳へコピー |
+| 設定 / データ | `#/data` | インポート・エクスポート・技リストの編集 |
+
+## 3. 機能整理
+
+**Phase 1（基本）**: キャラ選択 / 技ボタンによるルート入力（追加・削除・並べ替え・途中挿入・技ごとの備考・技名の直接入力・技名検索・Undo/Redo）/ コンボのCRUD / 一覧・検索・絞り込み・並べ替え / お気に入り / タグ / キャラ専用メモ / localStorage 永続化
+
+**Phase 2（共有）**: テキストコピー（依頼の書式）/ 単体・複数コンボの共有URL / 共有ビュー / 自分のメモ帳へコピー / JSON インポート・エクスポート
+
+**Phase 3（AI 認識）**: 動画ファイル・画面キャプチャ入力 / フレーム抽出 / 動作区間の検出 / 技候補と信頼度の表示 / 結果の修正 / ルート変換
+
+**Phase 4（改善）**: スマホ対応・キーボード操作・エラー処理・単体テスト・E2E 確認
+
+## 4. 技術スタックとデータ構造
+
+| 項目 | 採用 | 理由 |
+|---|---|---|
+| ビルド | **Vite + React + TypeScript** | 完全な静的サイトになり Netlify 等にそのまま置ける。SSR は不要 |
+| スタイル | **Tailwind CSS v4** | ダークテーマ・技カテゴリ別の色分けをトークンで管理 |
+| 状態管理 | **Zustand + persist** | localStorage へ自動保存。スキーマバージョンでマイグレーション可能 |
+| ルーティング | React Router（HashRouter） | 静的ホスティングでリロードしても 404 にならない。共有データが `#` 以降に入るためサーバーへ送信されない |
+| 共有エンコード | **lz-string** | JSON を圧縮して URL セーフ文字列化 |
+| テスト | Vitest（ロジック）+ Playwright（E2E） | |
+
+Next.js を採用しない理由: 現時点でサーバー処理が不要で、静的ビルドのほうが配置・共有が簡単なため。共有をサーバー保存方式にする段階で、Netlify Functions などを足せば済む。
+
+### データ構造
+
+キャラクター・技データはコードに直接書かず **`src/data/characters/*.json`（1キャラ1ファイル）** と **`src/data/common-moves.json`** で管理し、`import.meta.glob` で自動読み込みする。JSON ファイルを 1 つ追加するだけでキャラを増やせる。
+
+```ts
+// キャラクター定義（JSON）
+interface CharacterDef {
+  id: string; name: string; nameEn: string; color: string; image?: string;
+  moves: MoveDef[];          // キャラ固有技（必殺技・特殊技・SA）
+}
+interface MoveDef {
+  id: string;                // 'hadoken'
+  name: string;              // '波動拳'
+  short?: string;            // ボタン表示用略称
+  category: 'normal'|'special'|'unique'|'super'|'drive'|'system'|'connector';
+  input?: string;            // '236P'
+  aliases?: string[];        // 検索用
+}
+
+// ユーザーデータ（localStorage）
+interface Combo {
+  id: string; characterId: string; name: string;
+  situation: string;         // 'midscreen' | 'corner' | 'point_blank' | ...（ユーザー追加可）
+  difficulty: 1|2|3|4|5;
+  damage: number | null;
+  saGauge: number;           // 0〜3
+  driveGauge: number;        // 0〜6（0.5刻み）
+  route: RouteStep[];
+  notes: string; tags: string[]; favorite: boolean;
+  source: 'manual' | 'ai'; createdAt: number; updatedAt: number;
+}
+interface RouteStep { id: string; moveId?: string; label: string; category: MoveCategory; note?: string; }
+```
+
+`RouteStep` は `moveId` だけでなく `label` を必ず持つ。技データが後で変わっても、保存したコンボの表示が崩れないようにするため。
+
+### 共有URLとデータ保存方式
+
+- **方式 A（今回実装）: URL フラグメント埋め込み** `#/share?d=<lz-string圧縮データ>`
+  - サーバー不要で、URL を受け取った人は誰でも閲覧できる。データは `#` 以降にあるためサーバーへ送られない。
+  - 送るときはキー名を短縮した配列形式にして圧縮する。目安は 1 コンボ 300〜600 文字程度。
+  - 長さの問題: URL 全体が **約 8,000 文字** を超える場合は警告を出し、JSON ファイルでのエクスポートを案内する（X などの SNS や一部チャットでは長い URL が切られることがある）。
+- **方式 B（提案・未実装）: サーバー保存の短縮 URL**
+  - `POST /api/share` でデータを保存し、`/s/abc123` のような短い ID を返す。
+  - 構成案: **Netlify Functions + Netlify Blobs**（既に Netlify を使っているため最小構成で済む）。または Cloudflare Workers + KV、Supabase。
+  - 必要になる対策: 有効期限・サイズ上限・レート制限・スパム対策・削除手段。
+  - 多数のコンボの共有、SNS 投稿、OGP 画像が必要になった段階で導入する。
+
+## 5. AI 動作認識の実現方法
+
+### 前提（正直な評価）
+SF6 の映像から「どの技を出したか」を高精度で判定するのは **難易度の高い研究開発課題** です。
+キャラ 30 名弱 × 技数十種類 × 衣装・ステージ・カメラ・エフェクトの違いがあり、学習済みの公開モデルは存在しない（当方の知る限り）。
+そのため、**「パイプラインと拡張点を完成させる」「確実に言えることだけを出す」** 方針で進める。
+
+### パイプライン（プラグイン構造）
+
+```
+VideoSource（動画ファイル / 画面キャプチャ / 将来: カメラ・配信）
+   ↓ FrameSampler（指定fps・解析範囲・ROI で縮小フレームを抽出）
+   ↓ Analyzer[]（差し替え可能。各々 DetectedEvent[] を返す）
+   ↓ EventMerger（時間軸で統合・信頼度で並べる）
+   ↓ ReviewUI（ユーザーが確認・修正。未確定は「不明な動作」）
+   ↓ RouteStep[] へ変換 → コンボエディタへ
+```
+
+```ts
+interface Analyzer {
+  id: string; name: string; description: string;
+  status: 'available' | 'experimental' | 'planned';
+  analyze(frames: Frame[], ctx: AnalyzeContext, onProgress): Promise<DetectedEvent[]>;
+}
+interface DetectedEvent {
+  start: number; end: number;            // 秒
+  thumbnail: string;                      // 代表フレーム
+  candidates: { moveId: string; label: string; confidence: number }[];  // 空なら「不明な動作」
+  analyzerId: string;
+}
+```
+
+### 段階的に入れる解析器
+
+| 段階 | 解析器 | 内容 | 今回 |
+|---|---|---|---|
+| 1 | **動作区間検出（フレーム差分）** | 画面内の動きの量を時系列で計算し、動きが急に増えた区間を「動作」として切り出す。技名は判定しない | ✅ 実装 |
+| 2 | **テンプレート照合（ユーザー学習型）** | ユーザーが確認画面で「この区間は中足」と確定したフレームを特徴量として保存し、次回以降の類似度で候補を出す | ✅ 実験的に実装 |
+| 3 | 入力履歴 OCR | トレーニングモードの入力表示を OCR して入力からコマンドを推定。精度は最も期待できる | 計画のみ |
+| 4 | 姿勢推定（MediaPipe / MoveNet） | 骨格の時系列から攻撃モーションを分類。ゲームキャラへの適用は要検証 | 計画のみ |
+| 5 | 専用モデル（YOLO / 時系列 CNN を ONNX Runtime Web で実行） | ラベル付き動画データセットを作って学習させる | 計画のみ |
+| 6 | マルチモーダル LLM API | 区間ごとのフレームを API に送り、技名の候補を受け取る（要バックエンド・APIキー・費用） | 計画のみ |
+
+**安全策**: 信頼度が閾値（初期値 0.75）未満のイベントは自動では確定しない。初期状態は「不明な動作」とし、ユーザーが選んだものだけをルートに入れる。
+
+## 6. 難易度と技術的な問題点
+
+| 課題 | 内容 | 対策 |
+|---|---|---|
+| 技認識の精度 | エフェクト・カメラ移動・2キャラの重なりにより、フレーム差分だけでは技を特定できない | 段階 1 は区間検出のみと明示する。段階 2 以降で候補を出す |
+| 学習データ | キャラ×技ごとのラベル付き映像が必要 | 確認画面での修正結果をテンプレートとして蓄積できる構造にする |
+| ブラウザの処理負荷 | 長い動画の全フレーム解析は重い | 解析範囲の指定・fps 間引き・縮小フレーム（160×90）で処理する |
+| 画面キャプチャ | `getDisplayMedia` は PC ブラウザ限定。スマホは非対応 | スマホでは動画ファイル入力のみとする |
+| 著作権 | 公式キャラ画像を同梱できない | 頭文字＋テーマ色のアバターを標準にし、ユーザーが画像 URL を設定できるようにする |
+| 技データの正確性 | 全キャラの技名を正確に網羅するには継続的なメンテナンスが必要 | JSON で管理し、アプリ内で技の追加・編集をできるようにする |
+| 共有URLの長さ | 大量のコンボは URL に入りきらない | 警告を出してファイルエクスポートを案内する。将来は方式 B に移行 |
+| localStorage 容量 | 約 5MB まで。AI テンプレートの画像は容量が大きい | テンプレートは 16×16 程度の特徴量のみ保存し、上限件数を設ける |

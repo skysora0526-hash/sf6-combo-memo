@@ -1,0 +1,25 @@
+{
+ "id": "lily",
+ "name": "リリー",
+ "nameEn": "Lily",
+ "color": "#2dd4bf",
+ "order": 17,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "コンドルスパイア",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "コンドルダイブ",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "トマホークバスター",
+   "category": "special"
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+ "id": "elena",
+ "name": "エレナ",
+ "nameEn": "Elena",
+ "color": "#fde68a",
+ "order": 26,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "スピンサイズ",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "ライノホーン",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "リンクスティル",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "スクラッチホイール",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "マレットスマッシュ",
+   "category": "special"
+  }
+ ]
+}

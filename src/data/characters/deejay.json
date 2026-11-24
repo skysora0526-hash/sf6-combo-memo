@@ -1,0 +1,27 @@
+{
+ "id": "deejay",
+ "name": "ディージェイ",
+ "nameEn": "Dee Jay",
+ "color": "#fb7185",
+ "order": 12,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "エアスラッシャー",
+   "category": "special",
+   "numpad": "[4]6P"
+  },
+  {
+   "id": "sp2",
+   "name": "ジャックナイフマキシマム",
+   "category": "special",
+   "numpad": "[2]8K"
+  },
+  {
+   "id": "sp3",
+   "name": "ダブルローリングソバット",
+   "category": "special"
+  }
+ ]
+}

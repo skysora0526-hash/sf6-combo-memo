@@ -1,0 +1,36 @@
+{
+ "id": "dhalsim",
+ "name": "ダルシム",
+ "nameEn": "Dhalsim",
+ "color": "#ea580c",
+ "order": 10,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "ヨガファイア",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "ヨガフレイム",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "ヨガブラスト",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "ヨガテレポート",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "ヨガフロート",
+   "category": "special"
+  }
+ ]
+}

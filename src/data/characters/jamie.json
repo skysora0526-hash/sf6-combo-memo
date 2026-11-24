@@ -1,0 +1,35 @@
+{
+ "id": "jamie",
+ "name": "ジェイミー",
+ "nameEn": "Jamie",
+ "color": "#facc15",
+ "order": 5,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "流酔拳",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "爆廻",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "輪転脚",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "酔疾歩",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "一献",
+   "category": "special"
+  }
+ ]
+}

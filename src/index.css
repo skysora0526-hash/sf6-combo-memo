@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, sans-serif;
+  --font-display: 'Rajdhani', 'Inter', 'Hiragino Sans', sans-serif;
+  --color-bg: #0a0b0f;
+  --color-panel: #12141a;
+  --color-panel-2: #191c24;
+  --color-line: #262a35;
+  --color-line-2: #343947;
+  --color-ink: #e9ecf2;
+  --color-ink-2: #a4abba;
+  --color-ink-3: #6b7282;
+  --color-accent: #ff2d78;
+  --color-accent-2: #ff5c97;
+  --color-c-normal: #4ea8ff;
+  --color-c-special: #ff6a3d;
+  --color-c-unique: #b386ff;
+  --color-c-super: #ffc531;
+  --color-c-drive: #27e3a0;
+  --color-c-system: #8b95a7;
+  --color-c-connector: #6b7282;
+  --color-c-unknown: #ff9f43;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background-image:
+    radial-gradient(1200px 500px at 85% -10%, rgb(255 45 120 / 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgb(39 227 160 / 0.05), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+::selection {
+  background: rgb(255 45 120 / 0.4);
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cat-normal { --cat: var(--color-c-normal); }
+.cat-special { --cat: var(--color-c-special); }
+.cat-unique { --cat: var(--color-c-unique); }
+.cat-super { --cat: var(--color-c-super); }
+.cat-drive { --cat: var(--color-c-drive); }
+.cat-system { --cat: var(--color-c-system); }
+.cat-connector { --cat: var(--color-c-connector); }
+.cat-unknown { --cat: var(--color-c-unknown); }
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-line bg-panel/90 backdrop-blur;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-line-2 bg-panel-2 px-3 py-2 text-sm font-medium text-ink transition select-none hover:border-ink-3 hover:bg-[#20242e] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply border-accent bg-accent text-white hover:border-accent-2 hover:bg-accent-2;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent hover:bg-panel-2;
+  }
+  .btn-danger {
+    @apply border-red-500/40 text-red-300 hover:border-red-400 hover:bg-red-500/10;
+  }
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+  .input {
+    @apply w-full rounded-lg border border-line-2 bg-[#0e1015] px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-accent focus:outline-none;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold tracking-wider text-ink-3 uppercase;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line-2 bg-panel-2 px-2.5 py-0.5 text-xs text-ink-2;
+  }
+  .chip-on {
+    @apply border-accent bg-accent/15 text-accent-2;
+  }
+  /* 技ボタン（カテゴリ色） */
+  .move-btn {
+    border-color: color-mix(in oklab, var(--cat) 45%, transparent);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--cat) 14%, #151821), #12141a);
+    @apply relative min-h-11 rounded-lg border px-2 py-1.5 text-left text-[13px] leading-tight font-semibold text-ink transition select-none active:scale-[0.96];
+  }
+  .move-btn:hover {
+    border-color: var(--cat);
+    box-shadow: 0 0 0 1px var(--cat), 0 0 18px -6px var(--cat);
+  }
+  .move-btn::before {
+    content: '';
+    @apply absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-r;
+    background: var(--cat);
+  }
+  /* ルート上の技 */
+  .step {
+    border-color: color-mix(in oklab, var(--cat) 60%, transparent);
+    background: color-mix(in oklab, var(--cat) 16%, #12141a);
+    @apply rounded-md border px-2 py-1 text-sm font-semibold whitespace-nowrap;
+  }
+  .step-text {
+    color: color-mix(in oklab, var(--cat) 55%, white);
+  }
+  .font-display {
+    font-family: var(--font-display);
+  }
+}

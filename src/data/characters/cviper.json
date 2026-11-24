@@ -1,0 +1,25 @@
+{
+ "id": "cviper",
+ "name": "C.ヴァイパー",
+ "nameEn": "C.Viper",
+ "color": "#f43f5e",
+ "order": 28,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "サンダーナックル",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "バーニングキック",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "セイスモハンマー",
+   "category": "special"
+  }
+ ]
+}

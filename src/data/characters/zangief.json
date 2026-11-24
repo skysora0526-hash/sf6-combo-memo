@@ -1,0 +1,36 @@
+{
+ "id": "zangief",
+ "name": "ザンギエフ",
+ "nameEn": "Zangief",
+ "color": "#dc2626",
+ "order": 16,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "スクリューパイルドライバー",
+   "category": "special",
+   "numpad": "360P"
+  },
+  {
+   "id": "sp2",
+   "name": "ダブルラリアット",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "ボルシチダイナマイト",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "シベリアンエクスプレス",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "ツンドラストーム",
+   "category": "special"
+  }
+ ]
+}

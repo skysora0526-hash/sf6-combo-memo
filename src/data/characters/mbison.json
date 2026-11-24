@@ -1,0 +1,30 @@
+{
+ "id": "mbison",
+ "name": "ベガ",
+ "nameEn": "M.Bison",
+ "color": "#7c3aed",
+ "order": 23,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "サイコクラッシャー",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "ダブルニープレス",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "ヘッドプレス",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "シャドウライズ",
+   "category": "special"
+  }
+ ]
+}

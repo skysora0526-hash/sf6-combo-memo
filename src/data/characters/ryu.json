@@ -1,0 +1,57 @@
+{
+ "id": "ryu",
+ "name": "リュウ",
+ "nameEn": "Ryu",
+ "color": "#e8e3d8",
+ "order": 1,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "波動拳",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "昇龍拳",
+   "category": "special",
+   "numpad": "623P"
+  },
+  {
+   "id": "sp3",
+   "name": "竜巻旋風脚",
+   "category": "special",
+   "numpad": "214K"
+  },
+  {
+   "id": "sp4",
+   "name": "空中竜巻旋風脚",
+   "category": "special",
+   "numpad": "j.214K"
+  },
+  {
+   "id": "sp5",
+   "name": "上段足刀蹴り",
+   "category": "special"
+  },
+  {
+   "id": "sp6",
+   "name": "電刃練気",
+   "category": "special",
+   "numpad": "22P"
+  },
+  {
+   "id": "un1",
+   "name": "鎖骨割り",
+   "category": "unique",
+   "numpad": "6MP"
+  },
+  {
+   "id": "un2",
+   "name": "鳩尾砕き",
+   "category": "unique",
+   "numpad": "6HP"
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "id": "blanka",
+ "name": "ブランカ",
+ "nameEn": "Blanka",
+ "color": "#22c55e",
+ "order": 9,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "エレクトリックサンダー",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "ローリングアタック",
+   "category": "special",
+   "numpad": "[4]6P"
+  },
+  {
+   "id": "sp3",
+   "name": "バーチカルローリング",
+   "category": "special",
+   "numpad": "[2]8K"
+  },
+  {
+   "id": "sp4",
+   "name": "バックステップローリング",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "ブランカちゃん人形",
+   "category": "special"
+  }
+ ]
+}

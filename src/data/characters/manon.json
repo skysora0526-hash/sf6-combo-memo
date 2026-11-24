@@ -1,0 +1,30 @@
+{
+ "id": "manon",
+ "name": "マノン",
+ "nameEn": "Manon",
+ "color": "#f472b6",
+ "order": 13,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "ロン・ポワン",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "マネージュ・ドレ",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "ラン・ヴェルセ",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "デガジェ",
+   "category": "special"
+  }
+ ]
+}

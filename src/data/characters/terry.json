@@ -1,0 +1,39 @@
+{
+ "id": "terry",
+ "name": "テリー",
+ "nameEn": "Terry",
+ "color": "#ef4444",
+ "order": 24,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "パワーウェイブ",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "バーンナックル",
+   "category": "special",
+   "numpad": "214P"
+  },
+  {
+   "id": "sp3",
+   "name": "クラックシュート",
+   "category": "special",
+   "numpad": "214K"
+  },
+  {
+   "id": "sp4",
+   "name": "ライジングタックル",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "パワーダンク",
+   "category": "special",
+   "numpad": "623K"
+  }
+ ]
+}

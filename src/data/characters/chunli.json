@@ -1,0 +1,35 @@
+{
+ "id": "chunli",
+ "name": "春麗",
+ "nameEn": "Chun-Li",
+ "color": "#3b82f6",
+ "order": 3,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "気功拳",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "百裂脚",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "スピニングバードキック",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "天昇脚",
+   "category": "special"
+  },
+  {
+   "id": "sp5",
+   "name": "覇山蹴",
+   "category": "special"
+  }
+ ]
+}

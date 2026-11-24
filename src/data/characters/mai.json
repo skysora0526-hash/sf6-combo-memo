@@ -1,0 +1,32 @@
+{
+ "id": "mai",
+ "name": "舞",
+ "nameEn": "Mai",
+ "color": "#e11d48",
+ "order": 25,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "花蝶扇",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "龍炎舞",
+   "category": "special",
+   "numpad": "214P"
+  },
+  {
+   "id": "sp3",
+   "name": "必殺忍蜂",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "ムササビの舞",
+   "category": "special"
+  }
+ ]
+}

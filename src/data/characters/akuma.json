@@ -1,0 +1,44 @@
+{
+ "id": "akuma",
+ "name": "豪鬼",
+ "nameEn": "Akuma",
+ "color": "#991b1b",
+ "order": 22,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "豪波動拳",
+   "category": "special",
+   "numpad": "236P"
+  },
+  {
+   "id": "sp2",
+   "name": "豪昇龍拳",
+   "category": "special",
+   "numpad": "623P"
+  },
+  {
+   "id": "sp3",
+   "name": "竜巻斬空脚",
+   "category": "special",
+   "numpad": "214K"
+  },
+  {
+   "id": "sp4",
+   "name": "斬空波動拳",
+   "category": "special",
+   "numpad": "j.236P"
+  },
+  {
+   "id": "sp5",
+   "name": "百鬼襲",
+   "category": "special"
+  },
+  {
+   "id": "sp6",
+   "name": "阿修羅閃空",
+   "category": "special"
+  }
+ ]
+}

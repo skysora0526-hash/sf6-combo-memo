@@ -1,0 +1,30 @@
+{
+ "id": "rashid",
+ "name": "ラシード",
+ "nameEn": "Rashid",
+ "color": "#38bdf8",
+ "order": 19,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "スピニングミキサー",
+   "category": "special"
+  },
+  {
+   "id": "sp2",
+   "name": "イーグルスパイク",
+   "category": "special"
+  },
+  {
+   "id": "sp3",
+   "name": "アラビアンサイクロン",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "アラビアンスカイハイ",
+   "category": "special"
+  }
+ ]
+}

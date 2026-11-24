@@ -1,0 +1,32 @@
+{
+ "id": "cammy",
+ "name": "キャミィ",
+ "nameEn": "Cammy",
+ "color": "#16a34a",
+ "order": 18,
+ "dataStatus": "draft",
+ "moves": [
+  {
+   "id": "sp1",
+   "name": "スパイラルアロー",
+   "category": "special",
+   "numpad": "236K"
+  },
+  {
+   "id": "sp2",
+   "name": "キャノンスパイク",
+   "category": "special",
+   "numpad": "623K"
+  },
+  {
+   "id": "sp3",
+   "name": "フーリガンコンビネーション",
+   "category": "special"
+  },
+  {
+   "id": "sp4",
+   "name": "キャノンストライク",
+   "category": "special"
+  }
+ ]
+}
