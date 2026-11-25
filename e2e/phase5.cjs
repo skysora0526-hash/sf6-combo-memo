@@ -68,9 +68,16 @@ const LABELS = ['crmk', 'sp1', 'sp2'] // 中足 / 波動拳 / 昇龍拳
   ok(`評価を表示し、モデルを書き出し（${(JSON.stringify(model).length / 1024).toFixed(1)}KB、サムネイル・動画名なし）`)
 
   // ---------- 同梱 ----------
-  const out = execFileSync('node', ['scripts/install-model.mjs', modelPath, '--dir', `${USER_DIST}/ai-models`]).toString()
-  console.log('      ' + out.trim())
-  ok('install-model スクリプトで検証・配置')
+  // GitHub の画面からアップロードしたのと同じ状態: ファイルを置くだけ（index.json は触らない）
+  const fs = require('node:fs')
+  fs.copyFileSync(modelPath, `${USER_DIST}/ai-models/ryu.json`)
+  assert.ok(!fs.readFileSync(`${USER_DIST}/ai-models/index.json`, 'utf8').includes('ryu'))
+  ok('モデルファイルを ai-models/ に置くだけで同梱（index.json の編集不要）')
+  // 検証スクリプトも動く（別ディレクトリに出力して確認）
+  const tmp = fs.mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'model-'))
+  const out = execFileSync('node', ['scripts/install-model.mjs', modelPath, '--dir', tmp]).toString()
+  assert.match(out, /ryu: 6 サンプル \/ 3 技/)
+  ok('install-model スクリプトで検証できる')
 
   // ---------- 一般ユーザー ----------
   const user = await (await browser.newContext({ viewport: { width: 1440, height: 1000 } })).newPage()

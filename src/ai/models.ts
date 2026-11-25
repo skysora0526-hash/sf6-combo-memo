@@ -25,10 +25,6 @@ export interface LoadedModel {
   moveCount: number
 }
 
-export interface ModelIndex {
-  models: { characterId: string; samples: number; moves: number; createdAt: string }[]
-}
-
 export class ModelError extends Error {}
 
 export function validateModel(raw: unknown): ModelFile {
@@ -48,33 +44,31 @@ export function loadModelFile(file: ModelFile): LoadedModel {
 }
 
 const BASE = './ai-models/'
-let indexPromise: Promise<ModelIndex> | null = null
 const cache = new Map<string, Promise<LoadedModel | null>>()
 
-export function fetchModelIndex(): Promise<ModelIndex> {
-  indexPromise ??= fetch(`${BASE}index.json`, { cache: 'no-cache' })
-    .then((r) => (r.ok ? r.json() : { models: [] }))
-    .then((j: ModelIndex) => (Array.isArray(j?.models) ? j : { models: [] }))
-    .catch(() => ({ models: [] }))
-  return indexPromise
-}
-
-/** 同梱モデルを読み込む。ない・壊れている・バージョン違いなら null（理由は console に出す） */
+/**
+ * 同梱モデルを読み込む。public/ai-models/<キャラID>.json を直接取りに行く。
+ * index.json に載っていなくても読み込むので、GitHub の画面からファイルを
+ * アップロードするだけでモデルを追加できる（index.json は一覧表示用の補助）。
+ * ない・壊れている・バージョン違いなら null（理由は console に出す）。
+ */
 export function getBundledModel(characterId: string): Promise<LoadedModel | null> {
   if (!cache.has(characterId)) {
     cache.set(
       characterId,
-      fetchModelIndex().then(async (idx) => {
-        if (!idx.models.some((m) => m.characterId === characterId)) return null
+      (async () => {
         try {
           const r = await fetch(`${BASE}${encodeURIComponent(characterId)}.json`, { cache: 'no-cache' })
-          if (!r.ok) return null
-          return loadModelFile(validateModel(await r.json()))
+          // ファイルがないとき、サーバーによっては 404 ではなく HTML を返すので種類も確認する
+          if (!r.ok || !(r.headers.get('content-type') ?? '').includes('json')) return null
+          const file = validateModel(await r.json())
+          if (file.characterId !== characterId) throw new ModelError(`ファイル名と中身のキャラが違います（${file.characterId}）`)
+          return loadModelFile(file)
         } catch (e) {
           console.warn(`[ai] ${characterId} のモデルを読み込めません:`, e instanceof Error ? e.message : e)
           return null
         }
-      }),
+      })(),
     )
   }
   return cache.get(characterId)!
@@ -82,6 +76,5 @@ export function getBundledModel(characterId: string): Promise<LoadedModel | null
 
 /** テスト用 */
 export function resetModelCache() {
-  indexPromise = null
   cache.clear()
 }

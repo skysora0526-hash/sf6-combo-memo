@@ -339,14 +339,18 @@ function ExportPanel({
           </button>
         </div>
         <div className="rounded-lg bg-[#0d0f14] p-3 text-xs text-ink-2">
-          <p className="mb-1 font-semibold text-ink">アプリに同梱する手順</p>
+          <p className="mb-1 font-semibold text-ink">公開サイトに反映する手順</p>
           <ol className="list-decimal space-y-1 pl-5">
+            <li>上のボタンで <code>{charId}.json</code> をダウンロード</li>
             <li>
-              ダウンロードした <code>{charId}.json</code> をリポジトリで次のコマンドに渡す（検証して <code>public/ai-models/</code> に配置し、一覧を更新します）
-              <pre className="mt-1 overflow-x-auto rounded bg-black/40 p-2">node scripts/install-model.mjs ~/Downloads/{charId}.json</pre>
+              GitHub のリポジトリで <code>public/ai-models</code> フォルダを開き、「Add file」→「Upload files」で <code>{charId}.json</code> をアップロードして Commit
+              （同じ名前のファイルは上書きされます）
             </li>
-            <li>ビルドして公開する。{charName} の AI 認識でモデルが使われます</li>
+            <li>数分で公開サイトが自動で更新され、{charName} の AI 認識で候補が出るようになります</li>
           </ol>
+          <p className="mt-2 text-ink-3">
+            コマンドを使う場合: <code>node scripts/install-model.mjs {charId}.json</code>（形式を検証してから配置します）
+          </p>
         </div>
 
         <h3 className="pt-2 text-sm font-bold">データセットの保存・移行</h3>
