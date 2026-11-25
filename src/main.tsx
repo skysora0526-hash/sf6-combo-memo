@@ -10,6 +10,7 @@ import ComboEditor from './pages/ComboEditor'
 import AllCombos from './pages/AllCombos'
 import ShareView from './pages/ShareView'
 import DataPage from './pages/DataPage'
+import { STUDIO_ENABLED } from './studio/flag'
 
 // AI 認識は重いので遅延読み込み（通常のメモ帳機能の起動を遅くしない）
 const AiRecognize = lazy(() => import('./pages/AiRecognize'))
@@ -25,6 +26,15 @@ function EditorRoute() {
   return <ComboEditor key={`${loc.pathname}|${loc.key}`} />
 }
 
+// 開発者向けの学習スタジオ。一般向けビルドでは STUDIO_ENABLED が false になり、コードごと除外される
+const StudioPage = STUDIO_ENABLED ? lazy(() => import('./studio/StudioPage')) : null
+const studioRoutes = StudioPage
+  ? [
+      { path: '/studio', element: <Suspense fallback={null}><StudioPage /></Suspense> },
+      { path: '/studio/:charId', element: <Suspense fallback={null}><StudioPage /></Suspense> },
+    ]
+  : []
+
 const router = createHashRouter([
   {
     element: <Layout />,
@@ -39,6 +49,7 @@ const router = createHashRouter([
       { path: '/ai', element: ai },
       { path: '/share', element: <ShareView /> },
       { path: '/data', element: <DataPage /> },
+      ...studioRoutes,
       { path: '*', element: <ErrorPage /> },
     ],
   },

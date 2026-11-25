@@ -89,29 +89,6 @@ function splitLong(s: Segment, maxDur: number): Segment[] {
 
 /* ---------- 特徴量（テンプレート照合用） ---------- */
 
-const FW = 16
-const FH = 9
-
-function downsample(f: Frame): number[] {
-  const out: number[] = []
-  for (let y = 0; y < FH; y++)
-    for (let x = 0; x < FW; x++) {
-      let s = 0
-      let n = 0
-      const x0 = Math.floor((x * f.w) / FW)
-      const x1 = Math.floor(((x + 1) * f.w) / FW)
-      const y0 = Math.floor((y * f.h) / FH)
-      const y1 = Math.floor(((y + 1) * f.h) / FH)
-      for (let yy = y0; yy < y1; yy++)
-        for (let xx = x0; xx < x1; xx++) {
-          s += f.gray[yy * f.w + xx]
-          n++
-        }
-      out.push(n ? s / n : 0)
-    }
-  return out
-}
-
 function normalizeVec(v: number[]): number[] {
   const mean = v.reduce((a, b) => a + b, 0) / v.length
   const c = v.map((x) => x - mean)
@@ -119,19 +96,94 @@ function normalizeVec(v: number[]): number[] {
   return c.map((x) => x / norm)
 }
 
+/** 差分マップ |a - b|（フレームサイズのまま） */
+function diffMap(a: Frame, b: Frame): Float32Array {
+  const out = new Float32Array(a.gray.length)
+  for (let i = 0; i < out.length; i++) out[i] = Math.abs(a.gray[i] - b.gray[i])
+  return out
+}
+
+/** 動きの重心（ノイズを除くため平均以下の値は無視） */
+function centroid(m: Float32Array, w: number, h: number): { x: number; y: number; mass: number } {
+  let mean = 0
+  for (let i = 0; i < m.length; i++) mean += m[i]
+  mean /= m.length
+  let sx = 0
+  let sy = 0
+  let mass = 0
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const v = m[y * w + x] - mean * 2
+      if (v > 0) {
+        sx += v * x
+        sy += v * y
+        mass += v
+      }
+    }
+  return mass > 0 ? { x: sx / mass, y: sy / mass, mass } : { x: w / 2, y: h / 2, mass: 0 }
+}
+
+/** (cx, cy) を中心に side×side の範囲を n×n に縮小（はみ出しは 0） */
+function cropGrid(m: Float32Array, w: number, h: number, cx: number, cy: number, side: number, n: number): number[] {
+  const out: number[] = []
+  const x0 = cx - side / 2
+  const y0 = cy - side / 2
+  const cell = side / n
+  for (let gy = 0; gy < n; gy++)
+    for (let gx = 0; gx < n; gx++) {
+      let s = 0
+      let c = 0
+      for (let yy = Math.floor(y0 + gy * cell); yy < Math.floor(y0 + (gy + 1) * cell); yy++)
+        for (let xx = Math.floor(x0 + gx * cell); xx < Math.floor(x0 + (gx + 1) * cell); xx++) {
+          if (xx >= 0 && yy >= 0 && xx < w && yy < h) s += m[yy * w + xx]
+          c++
+        }
+      out.push(c ? s / c : 0)
+    }
+  return out
+}
+
+const unit = (v: number[]) => {
+  const n = Math.sqrt(v.reduce((a, b) => a + b * b, 0))
+  return n > 1e-6 ? v.map((x) => x / n) : v.map(() => 0)
+}
+
 /**
- * 区間の特徴量。静止した背景に引っ張られないよう「変化した場所」を主にする。
- *   [開始→ピークの変化 | ピーク→終了の変化 | 開始→終了の変化 | ピーク時の外観 × 0.35]
+ * 区間の特徴量（FEATURE_VERSION 2）。画面上の「位置」に依存しないように作る。
+ *   1. 動きの重心を中心に切り出した「開始→ピーク」「ピーク→終了」の変化の形（各 12×12）
+ *   2. 区間内での動きの重心の移動方向（横・縦・斜め、前半と後半）
+ * 各ブロックを長さ 1 にそろえて並べるので、コサイン類似度はブロックごとの一致度の平均に近くなる。
  */
 export function segmentFeature(seg: Segment, frames: Frame[]): number[] {
   const at = (t: number) => frames.reduce((best, f) => (Math.abs(f.t - t) < Math.abs(best.t - t) ? f : best), frames[0])
-  const a = downsample(at(seg.start))
-  const p = downsample(at(seg.peak))
-  const e = downsample(at(seg.end))
-  const d1 = p.map((x, i) => Math.abs(x - a[i]))
-  const d2 = e.map((x, i) => Math.abs(x - p[i]))
-  const d3 = e.map((x, i) => Math.abs(x - a[i]))
-  return [...normalizeVec(d1), ...normalizeVec(d2), ...normalizeVec(d3), ...normalizeVec(p).map((x) => x * 0.35)]
+  const a = at(seg.start)
+  const p = at(seg.peak)
+  const e = at(seg.end)
+  const { w, h } = p
+  const d1 = diffMap(a, p)
+  const d2 = diffMap(p, e)
+  const both = d1.map((x, i) => x + d2[i])
+  const c = centroid(both, w, h)
+  const side = h * 0.9
+  const shape1 = cropGrid(d1, w, h, c.x, c.y, side, 12)
+  const shape2 = cropGrid(d2, w, h, c.x, c.y, side, 12)
+
+  // 区間内のフレーム間差分の重心の軌跡 → 前半・後半の移動方向
+  const inSeg = frames.filter((f) => f.t >= seg.start - 1e-6 && f.t <= seg.end + 1e-6)
+  const path: { x: number; y: number }[] = []
+  for (let i = 1; i < inSeg.length; i++) {
+    const cc = centroid(diffMap(inSeg[i - 1], inSeg[i]), w, h)
+    if (cc.mass > 0) path.push(cc)
+  }
+  const dir = (from: number, to: number) => {
+    if (path.length < 2) return [0, 0]
+    const s = path[Math.min(path.length - 1, Math.floor(from * (path.length - 1)))]
+    const t = path[Math.min(path.length - 1, Math.ceil(to * (path.length - 1)))]
+    return [(t.x - s.x) / h, (t.y - s.y) / h]
+  }
+  const motion = unit([...dir(0, 0.5), ...dir(0.5, 1)])
+
+  return [...normalizeVec(shape1), ...normalizeVec(shape2), ...motion]
 }
 
 export function cosine(a: number[], b: number[]): number {

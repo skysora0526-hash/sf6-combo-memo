@@ -3,12 +3,14 @@ import { useStore } from '../store/useStore'
 import type { Notation } from '../types'
 import { Toaster } from './ui'
 import { Icon } from './Icon'
+import { STUDIO_ENABLED } from '../studio/flag'
 
 const NAV = [
   { to: '/', label: 'キャラ選択', icon: 'grid', end: true },
   { to: '/combos', label: '全コンボ', icon: 'list' },
   { to: '/ai', label: 'AI 認識', icon: 'ai' },
   { to: '/data', label: 'データ', icon: 'gear' },
+  ...(STUDIO_ENABLED ? [{ to: '/studio', label: '学習スタジオ', icon: 'edit' }] : []),
 ]
 
 export function Layout() {
@@ -55,7 +57,7 @@ export function Layout() {
       </main>
 
       {/* スマホ用ボトムナビ */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-bg/95 backdrop-blur sm:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid auto-cols-fr grid-flow-col border-t border-line bg-bg/95 backdrop-blur sm:hidden">
         {NAV.map((n) => (
           <NavLink
             key={n.to}

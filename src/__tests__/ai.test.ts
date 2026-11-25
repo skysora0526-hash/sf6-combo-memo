@@ -7,7 +7,7 @@ import { useTemplates } from '../ai/templateStore'
 import { COMMON_MOVES } from '../data'
 
 /** 静止画面の中で、指定した時間だけ四角形が動く合成フレーム */
-function synth(fps: number, dur: number, active: [number, number][], kind: 'slide' | 'rise' = 'slide', noise = 3): Frame[] {
+function synth(fps: number, dur: number, active: [number, number][], kind: 'slide' | 'rise' | 'diag' = 'slide', noise = 3, x0 = 10): Frame[] {
   const w = 64
   const h = 36
   let seed = 1
@@ -17,8 +17,8 @@ function synth(fps: number, dur: number, active: [number, number][], kind: 'slid
     const gray = new Uint8ClampedArray(w * h)
     const on = active.find(([s, e]) => t >= s && t <= e)
     const p = on ? (t - on[0]) / (on[1] - on[0]) : 0
-    const bx = kind === 'slide' ? 10 + Math.round(p * 30) : 28
-    const by = kind === 'rise' ? 24 - Math.round(p * 16) : 14
+    const bx = kind === 'rise' ? x0 + 18 : x0 + Math.round(p * (kind === 'diag' ? 16 : 30))
+    const by = kind === 'slide' ? 14 : 24 - Math.round(p * 16)
     for (let y = 0; y < h; y++)
       for (let x = 0; x < w; x++) gray[y * w + x] = (x >= bx && x < bx + 8 && y >= by && y < by + 8 ? 220 : 40) + rnd()
     return { t, w, h, gray }
@@ -56,6 +56,20 @@ describe('motion segmentation', () => {
   })
   it('energy は先頭 0', () => {
     expect(motionEnergy(synth(10, 1, []))[0]).toBe(0)
+  })
+})
+
+describe('position invariance (feature v2)', () => {
+  const feat = (kind: 'slide' | 'rise' | 'diag', x0: number) => {
+    const frames = synth(10, 2, [[0.5, 1.2]], kind, 3, x0)
+    return segmentFeature({ start: 0.4, end: 1.2, peak: 0.9, strength: 1 }, frames)
+  }
+  it('画面の別の位置で起きた同じ動きを、同じ動きとして判定できる', () => {
+    const train = (['slide', 'rise', 'diag'] as const).flatMap((k) => [0, 4].map((x) => ({ moveId: k, label: k, feature: feat(k, x) })))
+    for (const k of ['slide', 'rise', 'diag'] as const) {
+      const sims = train.map((t) => ({ m: t.moveId, s: cosine(feat(k, 22), t.feature) })).sort((a, b) => b.s - a.s)
+      expect(sims[0].m).toBe(k)
+    }
   })
 })
 

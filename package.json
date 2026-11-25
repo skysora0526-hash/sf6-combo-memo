@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "e2e": "bash e2e/run-all.sh"
+    "e2e": "bash e2e/run-all.sh",
+    "build:studio": "tsc -b && VITE_DEV_STUDIO=1 vite build --outDir dist-studio",
+    "model:install": "node scripts/install-model.mjs"
   },
   "dependencies": {
     "lz-string": "^1.5.0",

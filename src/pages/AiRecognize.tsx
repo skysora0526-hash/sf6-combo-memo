@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { MoveDef, RouteStep } from '../types'
 import { useCharacter, useCharacters, useMoves } from '../store/useStore'
 import { useDraft } from '../store/draft'
-import { CLASSIFIERS, SEGMENTERS, SUGGEST_THRESHOLD } from '../ai/registry'
+import { CLASSIFIERS, SEGMENTERS, SOURCE_LABEL, SUGGEST_THRESHOLD } from '../ai/registry'
+import { getBundledModel, type LoadedModel } from '../ai/models'
+import type { Classifier } from '../ai/types'
 import { manualEvent, runPipeline } from '../ai/pipeline'
 import { AbortError, canCaptureScreen, ROI_PRESETS, startScreenRecording, thumbnailAt } from '../ai/video'
 import { useTemplates } from '../ai/templateStore'
@@ -25,12 +27,23 @@ interface Review {
   ignored: boolean
   learn: boolean
   thumb?: string
+  /** 学習スタジオでデータセットに追加済み */
+  added?: boolean
 }
 
 const fmt = (t: number) => `${t.toFixed(2)}s`
 const MAX_RANGE = 90
 
-export default function AiRecognize() {
+/** 学習スタジオ（開発者用）として使うときの設定 */
+export interface StudioMode {
+  /** データセットの解析設定。サンプルがあるときは固定する */
+  lockedSettings?: { roiId: string; fps: number }
+  classifiers: Classifier[]
+  onAdd: (items: { ev: DetectedEvent; moveId: string; label: string; thumb?: string; video: string; roiId: string; fps: number }[]) => Promise<void>
+  sampleCount: number
+}
+
+export default function AiRecognize({ studio }: { studio?: StudioMode } = {}) {
   const { charId } = useParams()
   const navigate = useNavigate()
   const chars = useCharacters()
@@ -61,6 +74,33 @@ export default function AiRecognize() {
   const [clearArmed, setClearArmed] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const stopAtRef = useRef<number | null>(null)
+  const [model, setModel] = useState<LoadedModel | null | undefined>(undefined)
+
+  // 開発者モデルがあれば、その学習時の解析設定に合わせる
+  useEffect(() => {
+    if (studio || !charId) return
+    let alive = true
+    setModel(undefined)
+    getBundledModel(charId).then((m) => {
+      if (!alive) return
+      setModel(m)
+      if (m) {
+        setRoiId(m.file.roiId)
+        setFps(m.file.fps)
+      }
+    })
+    return () => {
+      alive = false
+    }
+  }, [charId, studio])
+  useEffect(() => {
+    if (studio?.lockedSettings) {
+      setRoiId(studio.lockedSettings.roiId)
+      setFps(studio.lockedSettings.fps)
+    }
+  }, [studio?.lockedSettings?.roiId, studio?.lockedSettings?.fps]) // eslint-disable-line react-hooks/exhaustive-deps
+  const settingsLocked = !!studio?.lockedSettings
+  const modelMismatch = !!model && (model.file.roiId !== roiId || model.file.fps !== fps)
 
   useEffect(
     () => () => {
@@ -74,11 +114,11 @@ export default function AiRecognize() {
   if (!charId || !ch) {
     return (
       <div className="space-y-4">
-        <Header />
-        <p className="text-sm text-ink-2">解析するキャラクターを選んでください（キャラごとの技リストと学習データを使います）。</p>
+        <Header studio={!!studio} />
+        <p className="text-sm text-ink-2">{studio ? '学習させるキャラクターを選んでください。' : '解析するキャラクターを選んでください（キャラごとの技リストと学習データを使います）。'}</p>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
           {chars.map((c) => (
-            <Link key={c.id} to={`/c/${c.id}/ai`} className="panel flex flex-col items-center gap-1.5 p-2 hover:border-line-2">
+            <Link key={c.id} to={studio ? `/studio/${c.id}` : `/c/${c.id}/ai`} className="panel flex flex-col items-center gap-1.5 p-2 hover:border-line-2">
               <Avatar ch={c} size="size-10" />
               <span className="truncate text-xs">{c.name}</span>
             </Link>
@@ -162,7 +202,7 @@ export default function AiRecognize() {
           roi: ROI_PRESETS.find((r) => r.id === roiId)!.roi,
           sensitivity,
           segmenter: SEGMENTERS[0],
-          classifiers: CLASSIFIERS,
+          classifiers: studio ? studio.classifiers : CLASSIFIERS,
         },
         { characterId: ch.id, moves, signal: ac.signal },
         (stage, p) => setProgress({ stage, p }),
@@ -233,6 +273,28 @@ export default function AiRecognize() {
       }
     })
 
+  const studioReady = active.filter((e) => reviews[e.id]?.confirmed && reviews[e.id]?.choice && !reviews[e.id]?.added)
+  const addToDataset = async () => {
+    if (!studio || !src) return
+    await studio.onAdd(
+      studioReady.map((ev) => ({
+        ev,
+        moveId: reviews[ev.id].choice!,
+        label: moveMap.get(reviews[ev.id].choice!)?.name ?? reviews[ev.id].choice!,
+        thumb: reviews[ev.id].thumb,
+        video: src.name,
+        roiId,
+        fps,
+      })),
+    )
+    setReviews((r) => {
+      const next = { ...r }
+      studioReady.forEach((e) => (next[e.id] = { ...next[e.id], added: true }))
+      return next
+    })
+    toast(`${studioReady.length} 件を学習データに追加しました`)
+  }
+
   const convert = () => {
     // ユーザーが確定した区間だけを学習データにする
     let learned = 0
@@ -265,9 +327,24 @@ export default function AiRecognize() {
 
   return (
     <div className="space-y-4">
-      <Header ch={ch} />
+      <Header ch={ch} studio={!!studio} />
 
-      <details className="panel group p-4 text-sm" open={!result}>
+      {!studio && (
+        <div className="panel flex flex-wrap items-center gap-2 px-4 py-3 text-sm" data-testid="model-status">
+          <span className={`rounded px-1.5 text-[10px] font-bold ${model ? 'bg-c-drive/20 text-c-drive' : 'bg-line-2 text-ink-3'}`}>開発者モデル</span>
+          {model === undefined ? (
+            <span className="text-ink-3">確認中…</span>
+          ) : model ? (
+            <span className="text-ink-2">
+              {ch.name} のモデルあり（{model.samples.length} サンプル / {model.moveCount} 技・{model.file.createdAt.slice(0, 10)} 作成）。検出した区間に技の候補を出します。
+            </span>
+          ) : (
+            <span className="text-ink-3">{ch.name} のモデルはまだありません。区間は「不明な動作」として出ます。</span>
+          )}
+        </div>
+      )}
+
+      {!studio && <details className="panel group p-4 text-sm" open={!result}>
         <summary className="flex cursor-pointer list-none items-center gap-2 font-semibold">
           <Icon name="ai" className="size-4 text-c-unique" />
           この機能で今できること・できないこと
@@ -277,7 +354,8 @@ export default function AiRecognize() {
           <p>
             映像から<strong className="text-ink">「動作が起きた区間」を検出</strong>し、区間ごとに技を選んでコンボルートに変換します。
             <strong className="text-ink">今の解析は技名を自動で判定できません。</strong>
-            検出した区間は最初「不明な動作」になり、あなたが技を選びます。選んだ結果は学習データとして保存され、次回から似た動作に候補（信頼度つき）が出ます（実験的）。
+            開発者モデルがあるキャラでは、区間ごとに技の候補と信頼度が出ます。信頼度が低いものは「不明な動作」のままにし、あなたが技を選びます。
+            あなたが選んだ結果も、あなた個人の学習データとして保存され、次回の候補に使われます（実験的）。
           </p>
           <ul className="grid gap-1.5 sm:grid-cols-2">
             {[...SEGMENTERS, ...CLASSIFIERS].map((a) => (
@@ -300,7 +378,7 @@ export default function AiRecognize() {
             映像はこのブラウザ内だけで処理され、どこにも送信されません。カメラの移動・ヒットエフェクト・暗転演出でも「動作」として検出されることがあります。
           </p>
         </div>
-      </details>
+      </details>}
 
       {/* 入力 */}
       {!src && (
@@ -402,7 +480,7 @@ export default function AiRecognize() {
             </div>
             <label className="block">
               <span className="label">解析エリア</span>
-              <select className="input" value={roiId} onChange={(e) => setRoiId(e.target.value)}>
+              <select className="input" value={roiId} onChange={(e) => setRoiId(e.target.value)} disabled={settingsLocked} aria-label="解析エリア">
                 {ROI_PRESETS.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.label}
@@ -413,7 +491,7 @@ export default function AiRecognize() {
             <div className="grid grid-cols-2 gap-2">
               <label className="block">
                 <span className="label">細かさ</span>
-                <select className="input" value={fps} onChange={(e) => setFps(Number(e.target.value))}>
+                <select className="input" value={fps} onChange={(e) => setFps(Number(e.target.value))} disabled={settingsLocked} aria-label="細かさ">
                   <option value={5}>5 fps（速い）</option>
                   <option value={10}>10 fps</option>
                   <option value={20}>20 fps（精密）</option>
@@ -424,6 +502,15 @@ export default function AiRecognize() {
                 <input type="range" min={0} max={1} step={0.05} value={sensitivity} onChange={(e) => setSensitivity(Number(e.target.value))} className="mt-3 w-full accent-[var(--color-accent)]" aria-label="感度" />
               </label>
             </div>
+            {settingsLocked && <p className="text-xs text-ink-3">データセットと同じ解析設定に固定しています（設定が違うと特徴量を比較できません）。</p>}
+            {modelMismatch && (
+              <p className="rounded border border-c-super/40 bg-c-super/10 p-2 text-xs text-c-super">
+                開発者モデルの学習時と設定が違うため、候補の精度が下がります。
+                <button className="ml-1 underline" onClick={() => { setRoiId(model!.file.roiId); setFps(model!.file.fps) }}>
+                  元に戻す
+                </button>
+              </p>
+            )}
             {progress ? (
               <div className="space-y-2" role="status">
                 <div className="flex justify-between text-xs text-ink-2">
@@ -445,14 +532,18 @@ export default function AiRecognize() {
             )}
             {range[1] - range[0] > MAX_RANGE + 0.01 && <p className="text-xs text-red-300">解析範囲を {MAX_RANGE} 秒以内にしてください。</p>}
             {error && <p className="rounded border border-red-500/40 bg-red-500/10 p-2 text-xs text-red-200">{error}</p>}
+            {studio ? (
+              <div className="border-t border-line pt-3 text-xs text-ink-3">データセット: {studio.sampleCount} サンプル</div>
+            ) : (
             <div className="border-t border-line pt-3 text-xs text-ink-3">
-              {ch.name} の学習データ: {tplCount} 件
+              {ch.name} のあなたの学習データ: {tplCount} 件
               {tplCount > 0 && (
                 <button className="ml-2 underline hover:text-ink" onClick={() => (clearArmed ? (clearTemplates(ch.id), setClearArmed(false)) : setClearArmed(true))}>
                   {clearArmed ? 'もう一度押すと消去' : '消去'}
                 </button>
               )}
             </div>
+            )}
           </aside>
         </div>
       )}
@@ -512,6 +603,7 @@ export default function AiRecognize() {
                       )}
                       {chosen && !r.confirmed && <span className="text-[11px] text-c-super">AI 推定 {Math.round((chosenConf ?? 0) * 100)}%・未確認</span>}
                       {r.confirmed && <span className="text-[11px] text-c-drive">✓ 確定</span>}
+                      {r.added && <span className="text-[11px] text-c-unique">学習済み</span>}
                     </div>
                     {ev.candidates.length > 0 && (
                       <div className="flex flex-wrap gap-1">
@@ -523,6 +615,7 @@ export default function AiRecognize() {
                             title="この候補で確定"
                           >
                             {c.label}
+                            <span className="text-[9px] text-ink-3">{SOURCE_LABEL[c.source] ?? c.source}</span>
                             <span className="relative h-1.5 w-8 overflow-hidden rounded bg-line-2">
                               <span className="absolute inset-y-0 left-0 bg-c-unique" style={{ width: `${c.confidence * 100}%` }} />
                             </span>
@@ -552,7 +645,18 @@ export default function AiRecognize() {
             })}
           </ol>
 
-          {events.length > 0 && (
+          {studio && events.length > 0 && (
+            <div className="panel sticky bottom-16 z-10 flex flex-wrap items-center gap-3 p-4 sm:bottom-4">
+              <p className="text-xs text-ink-2">
+                技を選んで「確定」した区間だけが学習データになります。未確認の推定・不明な動作・除外した区間は追加されません。
+              </p>
+              <button className="btn btn-primary ml-auto" onClick={addToDataset} disabled={!studioReady.length} data-testid="add-samples">
+                確定した {studioReady.length} 区間を学習データに追加
+              </button>
+            </div>
+          )}
+
+          {!studio && events.length > 0 && (
             <div className="panel sticky bottom-16 z-10 space-y-3 p-4 sm:bottom-4">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-ink-2">変換後のルート</span>
@@ -573,7 +677,7 @@ export default function AiRecognize() {
 
       <Modal open={!!picking} onClose={() => setPicking(null)} title="この区間の技を選ぶ" wide>
         <MovePalette moves={moves} onPick={pickMove} onText={() => toast('AI 認識結果には技リストの技を選んでください。直接入力はエディタで行えます', 'info')} />
-        {picking && reviews[picking] && (
+        {!studio && picking && reviews[picking] && (
           <label className="mt-3 flex items-center gap-2 text-sm text-ink-2">
             <input type="checkbox" checked={reviews[picking].learn} onChange={(e) => setReview(picking, { learn: e.target.checked })} />
             この区間を学習データとして保存する（変換時）
@@ -584,18 +688,21 @@ export default function AiRecognize() {
   )
 }
 
-function Header({ ch }: { ch?: ReturnType<typeof useCharacter> }) {
+function Header({ ch, studio }: { ch?: ReturnType<typeof useCharacter>; studio?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       {ch && (
-        <Link to={`/c/${ch.id}`} className="btn btn-ghost btn-sm" aria-label="戻る">
+        <Link to={studio ? '/studio' : `/c/${ch.id}`} className="btn btn-ghost btn-sm" aria-label="戻る">
           <Icon name="left" />
         </Link>
       )}
       {ch && <Avatar ch={ch} size="size-10" />}
       <div>
-        <p className="font-display text-xs font-bold tracking-[0.3em] text-c-unique">AI MOTION RECOGNITION · BETA</p>
-        <h1 className="text-xl font-bold">AI 動作認識{ch && <span className="ml-2 text-ink-2">— {ch.name}</span>}</h1>
+        <p className="font-display text-xs font-bold tracking-[0.3em] text-c-unique">{studio ? 'DEVELOPER · TRAINING STUDIO' : 'AI MOTION RECOGNITION · BETA'}</p>
+        <h1 className="text-xl font-bold">
+          {studio ? '学習スタジオ' : 'AI 動作認識'}
+          {ch && <span className="ml-2 text-ink-2">— {ch.name}</span>}
+        </h1>
       </div>
     </div>
   )
