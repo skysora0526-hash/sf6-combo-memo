@@ -56,6 +56,11 @@ export function Layout() {
         <Outlet />
       </main>
 
+      <footer className="mx-auto max-w-7xl px-4 pb-6 text-[11px] leading-relaxed text-ink-3">
+        SF6 Combo Memo は個人が制作した非公式のファンツールで、株式会社カプコンとは関係ありません。
+        「ストリートファイター」は株式会社カプコンの登録商標です。データはすべてお使いのブラウザ内に保存され、サーバーには送信されません。
+      </footer>
+
       {/* スマホ用ボトムナビ */}
       <nav className="fixed inset-x-0 bottom-0 z-40 grid auto-cols-fr grid-flow-col border-t border-line bg-bg/95 backdrop-blur sm:hidden">
         {NAV.map((n) => (
